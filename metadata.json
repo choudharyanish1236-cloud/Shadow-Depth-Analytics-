@@ -1,0 +1,7 @@
+{
+  "name": "ShadowDepth Analytics",
+  "description": "An interactive geometric simulation and analysis tool for estimating distance based on shadow projection geometry. It uses the point-source light model to classify object proximity as Touching, Near, or Away.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
