@@ -26,7 +26,7 @@ const GeometryVisualizer: React.FC<Props> = ({ state }) => {
   return (
     <div className="bg-slate-900 rounded-xl p-6 shadow-inner border border-slate-800 flex flex-col items-center">
       <h3 className="text-sm font-semibold text-slate-400 mb-4 uppercase tracking-wider">Side View Visualization</h3>
-      <svg width={canvasWidth} height={canvasHeight} className="overflow-visible">
+      <svg width={canvasWidth} height={canvasHeight} className="overflow-visible group">
         {/* Ground/Plane */}
         <line x1={0} y1={canvasHeight - 20} x2={canvasWidth} y2={canvasHeight - 20} stroke="#334155" strokeWidth="2" />
         
@@ -42,11 +42,31 @@ const GeometryVisualizer: React.FC<Props> = ({ state }) => {
         <rect x={faceX} y={20} width="10" height={canvasHeight - 40} fill="#475569" rx="2" />
         <text x={faceX + 15} y={130} transform={`rotate(90 ${faceX + 15},130)`} fill="#94a3b8" className="text-[10px] uppercase font-bold">Surface Plane</text>
 
-        {/* Shadow on Surface */}
-        <rect x={faceX - 2} y={100 - shadowSize} width="4" height={shadowSize * 2} fill="#020617" opacity="0.8" rx="1" />
+        {/* Shadow on Surface - Enhanced interactive scale and glow */}
+        <rect 
+          x={faceX - 2} 
+          y={100 - shadowSize} 
+          width="6" 
+          height={shadowSize * 2} 
+          fill="#020617" 
+          opacity="0.9" 
+          rx="1" 
+          className="transition-all duration-300 ease-in-out hover:scale-105 hover:opacity-100 hover:brightness-150 origin-center cursor-crosshair"
+          style={{ transformBox: 'fill-box' }}
+        />
+        <text x={faceX - 10} y={100 + shadowSize + 15} textAnchor="end" fill="#475569" className="text-[10px] font-bold italic">SHADOW</text>
 
-        {/* Hand */}
-        <rect x={handX - 5} y={100 - handSize} width="10" height={handSize * 2} fill="#94a3b8" rx="2" className="transition-all duration-300 ease-out" />
+        {/* Hand - Enhanced interactive scale and color transition */}
+        <rect 
+          x={handX - 5} 
+          y={100 - handSize} 
+          width="10" 
+          height={handSize * 2} 
+          fill="#94a3b8" 
+          rx="2" 
+          className="transition-all duration-300 ease-out hover:scale-110 hover:fill-sky-400 origin-center cursor-pointer" 
+          style={{ transformBox: 'fill-box' }}
+        />
         <text x={handX} y={100 + handSize + 15} textAnchor="middle" fill="#94a3b8" className="text-[10px] font-bold">HAND</text>
 
         {/* Dimension Labels */}
