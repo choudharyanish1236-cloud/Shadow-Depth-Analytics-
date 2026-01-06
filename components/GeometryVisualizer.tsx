@@ -42,32 +42,52 @@ const GeometryVisualizer: React.FC<Props> = ({ state }) => {
         <rect x={faceX} y={20} width="10" height={canvasHeight - 40} fill="#475569" rx="2" />
         <text x={faceX + 15} y={130} transform={`rotate(90 ${faceX + 15},130)`} fill="#94a3b8" className="text-[10px] uppercase font-bold">Surface Plane</text>
 
-        {/* Shadow on Surface - Enhanced interactive scale and glow */}
-        <rect 
-          x={faceX - 2} 
-          y={100 - shadowSize} 
-          width="6" 
-          height={shadowSize * 2} 
-          fill="#020617" 
-          opacity="0.9" 
-          rx="1" 
-          className="transition-all duration-300 ease-in-out hover:scale-105 hover:opacity-100 hover:brightness-150 origin-center cursor-crosshair"
-          style={{ transformBox: 'fill-box' }}
-        />
-        <text x={faceX - 10} y={100 + shadowSize + 15} textAnchor="end" fill="#475569" className="text-[10px] font-bold italic">SHADOW</text>
+        {/* Shadow on Surface - Slightly refined hover and transition */}
+        <g className="cursor-crosshair transition-all duration-500 ease-out group/shadow">
+          <rect 
+            x={faceX - 2} 
+            y={100 - shadowSize} 
+            width="6" 
+            height={shadowSize * 2} 
+            fill="#020617" 
+            opacity="0.9" 
+            rx="1" 
+            className="transition-all duration-500 ease-out hover:scale-y-105 hover:brightness-200 origin-center"
+            style={{ transformBox: 'fill-box' }}
+          />
+          <text 
+            x={faceX - 12} 
+            y={100 + shadowSize + 15} 
+            textAnchor="end" 
+            fill="#475569" 
+            className="text-[10px] font-bold italic transition-colors duration-300 group-hover/shadow:fill-slate-300"
+          >
+            SHADOW
+          </text>
+        </g>
 
-        {/* Hand - Enhanced interactive scale and color transition */}
-        <rect 
-          x={handX - 5} 
-          y={100 - handSize} 
-          width="10" 
-          height={handSize * 2} 
-          fill="#94a3b8" 
-          rx="2" 
-          className="transition-all duration-300 ease-out hover:scale-110 hover:fill-sky-400 origin-center cursor-pointer" 
-          style={{ transformBox: 'fill-box' }}
-        />
-        <text x={handX} y={100 + handSize + 15} textAnchor="middle" fill="#94a3b8" className="text-[10px] font-bold">HAND</text>
+        {/* Hand - Refined hover scaling and smooth transition */}
+        <g className="cursor-pointer transition-all duration-500 ease-out group/hand">
+          <rect 
+            x={handX - 5} 
+            y={100 - handSize} 
+            width="10" 
+            height={handSize * 2} 
+            fill="#94a3b8" 
+            rx="2" 
+            className="transition-all duration-500 ease-out hover:scale-110 hover:fill-sky-400 origin-center hover:shadow-2xl" 
+            style={{ transformBox: 'fill-box' }}
+          />
+          <text 
+            x={handX} 
+            y={100 + handSize + 15} 
+            textAnchor="middle" 
+            fill="#94a3b8" 
+            className="text-[10px] font-bold transition-colors duration-300 group-hover/hand:fill-sky-300"
+          >
+            HAND
+          </text>
+        </g>
 
         {/* Dimension Labels */}
         <line x1={lightX} y1={canvasHeight - 40} x2={faceX} y2={canvasHeight - 40} stroke="#64748b" strokeWidth="1" />
