@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { 
   DEFAULT_L, 
@@ -13,6 +13,7 @@ import { GeometryState, PredictionResult } from './types';
 import GeometryVisualizer from './components/GeometryVisualizer';
 import StatsCard from './components/StatsCard';
 import CameraAnalysis from './components/CameraAnalysis';
+import CalibrationWizard from './components/CalibrationWizard';
 import { geminiService } from './services/geminiService';
 
 const App: React.FC = () => {
@@ -24,12 +25,10 @@ const App: React.FC = () => {
 
   const [isCalibrating, setIsCalibrating] = useState(false);
   const [detectedArea, setDetectedArea] = useState(0);
+  const [isVisionStable, setIsVisionStable] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState<string>("");
   const [isAiLoading, setIsAiLoading] = useState<boolean>(false);
 
-  // The result is either driven by the slider (synthetic) or by camera area (live)
-  // For this version, we'll keep the slider as the main "simulation" driver but
-  // allow the camera to "calibrate" the A_hand.
   const result = useMemo((): PredictionResult => {
     const A_shadow = calculateShadowArea(state.A_hand, state.L, state.h);
     const h_est = estimateH(state.L, state.A_hand, A_shadow);
@@ -52,16 +51,20 @@ const App: React.FC = () => {
     return data;
   }, [state.L, state.A_hand]);
 
-  const handleAreaDetected = (area: number) => {
+  const handleAreaDetected = useCallback((area: number) => {
     setDetectedArea(area);
-  };
+  }, []);
 
-  const finalizeCalibration = () => {
-    if (detectedArea > 0) {
-      setState(prev => ({ ...prev, A_hand: detectedArea }));
+  const handleStabilityChange = useCallback((stable: boolean) => {
+    setIsVisionStable(stable);
+  }, []);
+
+  const finalizeCalibration = useCallback((area: number) => {
+    if (area > 0) {
+      setState(prev => ({ ...prev, A_hand: area }));
       setIsCalibrating(false);
     }
-  };
+  }, []);
 
   const handleAiAnalyze = async () => {
     setIsAiLoading(true);
@@ -71,12 +74,20 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 relative min-h-screen">
+      {isCalibrating && (
+        <CalibrationWizard 
+          currentDetectedArea={detectedArea}
+          isStable={isVisionStable}
+          onComplete={finalizeCalibration}
+          onCancel={() => setIsCalibrating(false)}
+        />
+      )}
+
       {/* Header */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-8">
         <div>
           <h1 className="text-4xl font-black text-white tracking-tighter italic uppercase">Shadow<span className="text-amber-500">Depth</span> <span className="text-slate-700 not-italic font-light">Pro</span></h1>
-          {/* Fix: Replaced $A_{hand}$ with A_hand to prevent JSX from searching for a variable named 'hand' */}
           <p className="text-slate-400 mt-1 max-w-xl text-sm">
             Refactored with edge-detection based shadow masking and interactive A_hand calibration.
           </p>
@@ -90,7 +101,7 @@ const App: React.FC = () => {
               onClick={() => setIsCalibrating(!isCalibrating)}
               className={`px-4 py-2 rounded-xl text-xs font-black uppercase transition-all border ${isCalibrating ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.3)]' : 'bg-slate-800 text-slate-400 border-slate-700 hover:border-amber-500/50 hover:text-amber-500'}`}
             >
-              {isCalibrating ? 'Cancel Calibration' : 'Recalibrate'}
+              {isCalibrating ? 'Cancel Wizard' : 'Launch Wizard'}
             </button>
         </div>
       </header>
@@ -102,6 +113,7 @@ const App: React.FC = () => {
         <div className="lg:col-span-4 space-y-6">
           <CameraAnalysis 
             onAreaDetected={handleAreaDetected} 
+            onStabilityChange={handleStabilityChange}
             isCalibrating={isCalibrating}
             onCalibrationComplete={finalizeCalibration}
           />
